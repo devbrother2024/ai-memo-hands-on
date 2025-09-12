@@ -49,13 +49,19 @@ alwaysApply: true
 -   데이터베이스: **Supabase Postgres**
 -   모든 테이블은 `/drizzle/schema.ts`의 **Drizzle Schema**로 정의
 -   마이그레이션은 **Drizzle Kit**으로 실행
--   **Supabase RLS(Row Level Security)** 활성화 → SQL 마이그레이션으로 정책 관리
+-   권한 스코프는 **서버 코드에서 처리**
+
+### 사용 원칙
+
+-   **인증/세션**: Supabase Auth API 사용 (`signIn*`, `signOut*`, `getUser*`, `onAuthStateChange` 등)
+-   **데이터 CRUD**: DrizzleORM으로 처리
+-   **권한 제어**: 모든 Drizzle 쿼리는 사용자 스코프를 WHERE로 직접 강제
 
 ---
 
 ## 인증 & 보안 (AUTH & SECURITY)
 
--   인증은 **Supabase Auth** 사용
+-   **인증/세션은 Supabase Auth** 사용
 -   **클라이언트에서 직접 외부 API 호출 금지** (예: Gemini API) → 서버사이드에서만 호출
 
 ---
