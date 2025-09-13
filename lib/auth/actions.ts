@@ -75,16 +75,43 @@ export async function signIn(formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
-    const { error } = await supabase.auth.signInWithPassword({
+    // 서버 사이드 유효성 검사
+    if (!email || !password) {
+        return {
+            error: '이메일과 비밀번호를 입력해주세요.'
+        }
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
     })
 
     if (error) {
+        // Supabase 에러를 사용자 친화적 메시지로 변환
+        let errorMessage = '로그인 중 오류가 발생했습니다.'
+
+        if (error.message.includes('Invalid login credentials')) {
+            errorMessage = '이메일 또는 비밀번호가 올바르지 않습니다.'
+        } else if (error.message.includes('Email not confirmed')) {
+            errorMessage =
+                '이메일 인증이 완료되지 않았습니다. 이메일을 확인해주세요.'
+        } else if (error.message.includes('Too many requests')) {
+            errorMessage =
+                '너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요.'
+        }
+
         return {
-            error: '이메일 또는 비밀번호가 올바르지 않습니다.'
+            error: errorMessage
         }
     }
 
-    redirect('/dashboard')
+    // 이메일 인증 확인
+    if (data.user && !data.user.email_confirmed_at) {
+        return {
+            error: '이메일 인증이 완료되지 않았습니다. 이메일을 확인하신 후 인증 링크를 클릭해주세요.'
+        }
+    }
+
+    redirect('/')
 }

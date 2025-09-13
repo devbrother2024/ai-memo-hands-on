@@ -1,8 +1,8 @@
-import { SignUpForm } from '@/components/auth/signup-form'
+import { SignInForm } from '@/components/auth/signin-form'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
-export default async function SignUpPage() {
+export default async function SignInPage() {
     // 이미 로그인된 사용자는 대시보드로 리다이렉트
     const supabase = await createClient()
     const {
@@ -20,15 +20,15 @@ export default async function SignUpPage() {
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
                         AI 메모장
                     </h1>
-                    <p className="text-gray-600">똑똑한 메모 관리의 시작</p>
+                    <p className="text-gray-600">다시 만나서 반갑습니다</p>
                 </div>
-                <SignUpForm />
+                <SignInForm />
             </div>
         </div>
     )
 }
 
 export const metadata = {
-    title: '회원가입 - AI 메모장',
-    description: 'AI 메모장에 새 계정을 만들어보세요'
+    title: '로그인 - AI 메모장',
+    description: 'AI 메모장에 로그인하세요'
 }

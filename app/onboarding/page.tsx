@@ -47,7 +47,7 @@ export default function OnboardingPage() {
                     </div>
 
                     <Button asChild className="w-full">
-                        <Link href="/dashboard">메모 작성 시작하기</Link>
+                        <Link href="/">메모 작성 시작하기</Link>
                     </Button>
                 </CardContent>
             </Card>

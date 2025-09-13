@@ -1,103 +1,143 @@
-import Image from "next/image";
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { PenTool, Search, Tag, Download } from 'lucide-react'
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+export default async function HomePage() {
+    // 로그인 확인
+    const supabase = await createClient()
+    const {
+        data: { user }
+    } = await supabase.auth.getUser()
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    if (!user) {
+        redirect('/signin')
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* 헤더 */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">
+                                AI 메모장
+                            </h1>
+                            <p className="text-gray-600 mt-1">
+                                안녕하세요, {user.email}님! 👋
+                            </p>
+                        </div>
+                        <Button variant="outline">로그아웃</Button>
+                    </div>
+                </div>
+
+                {/* 환영 메시지 */}
+                <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                    <CardHeader>
+                        <CardTitle className="text-blue-900">
+                            대시보드에 오신 것을 환영합니다!
+                        </CardTitle>
+                        <CardDescription className="text-blue-700">
+                            AI의 도움을 받아 똑똑하게 메모를 관리해보세요.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button className="bg-blue-600 hover:bg-blue-700">
+                            첫 번째 메모 작성하기
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                {/* 기능 카드들 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader className="pb-4">
+                            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-3">
+                                <PenTool className="w-6 h-6 text-green-600" />
+                            </div>
+                            <CardTitle className="text-lg">메모 작성</CardTitle>
+                            <CardDescription>
+                                텍스트 및 음성으로 메모를 작성하세요
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader className="pb-4">
+                            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-3">
+                                <Tag className="w-6 h-6 text-purple-600" />
+                            </div>
+                            <CardTitle className="text-lg">AI 태깅</CardTitle>
+                            <CardDescription>
+                                AI가 자동으로 태그를 생성합니다
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader className="pb-4">
+                            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+                                <Search className="w-6 h-6 text-orange-600" />
+                            </div>
+                            <CardTitle className="text-lg">
+                                스마트 검색
+                            </CardTitle>
+                            <CardDescription>
+                                강력한 검색과 필터링 기능
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader className="pb-4">
+                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+                                <Download className="w-6 h-6 text-blue-600" />
+                            </div>
+                            <CardTitle className="text-lg">
+                                데이터 내보내기
+                            </CardTitle>
+                            <CardDescription>
+                                메모를 다양한 형식으로 내보내기
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+                </div>
+
+                {/* 최근 메모 (빈 상태) */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>최근 메모</CardTitle>
+                        <CardDescription>
+                            아직 작성된 메모가 없습니다
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-center py-12">
+                            <PenTool className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                첫 번째 메모를 작성해보세요
+                            </h3>
+                            <p className="text-gray-500 mb-6">
+                                AI가 자동으로 요약하고 태그를 생성해드립니다
+                            </p>
+                            <Button>메모 작성하기</Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    )
+}
+
+export const metadata = {
+    title: 'AI 메모장 - 똑똑한 메모 관리',
+    description: 'AI의 도움을 받아 효율적으로 메모를 관리하세요'
 }
