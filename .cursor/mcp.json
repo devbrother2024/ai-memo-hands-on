@@ -13,10 +13,10 @@
             "args": [
                 "-y",
                 "@supabase/mcp-server-supabase",
-                "--project-ref=<project-ref>"
+                "--project-ref=inlmtqofuspdkcrlsent"
             ],
             "env": {
-                "SUPABASE_ACCESS_TOKEN": "<access-token>"
+                "SUPABASE_ACCESS_TOKEN": "sbp_c3d8868ef6ca8d04ba66617afd0c5f9938d5b9f6"
             }
         }
     }
