@@ -115,3 +115,117 @@ export async function signIn(formData: FormData) {
 
     redirect('/')
 }
+
+export async function signOut() {
+    const supabase = await createClient()
+
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+        return {
+            error: '로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.'
+        }
+    }
+
+    redirect('/signin')
+}
+
+export async function resetPasswordForEmail(formData: FormData) {
+    const supabase = await createClient()
+
+    const email = formData.get('email') as string
+
+    // 서버 사이드 유효성 검사
+    if (!email) {
+        return {
+            error: '이메일을 입력해주세요.'
+        }
+    }
+
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+        return {
+            error: '올바른 이메일 형식을 입력해주세요.'
+        }
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password`
+    })
+
+    if (error) {
+        let errorMessage = '비밀번호 재설정 링크 발송 중 오류가 발생했습니다.'
+
+        if (error.message.includes('Email rate limit exceeded')) {
+            errorMessage =
+                '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.'
+        }
+
+        return {
+            error: errorMessage
+        }
+    }
+
+    return {
+        success: true,
+        message: '비밀번호 재설정 링크가 이메일로 발송되었습니다.'
+    }
+}
+
+export async function updatePassword(formData: FormData) {
+    const supabase = await createClient()
+
+    const password = formData.get('password') as string
+    const confirmPassword = formData.get('confirmPassword') as string
+
+    // 서버 사이드 유효성 검사
+    if (!password || !confirmPassword) {
+        return {
+            error: '비밀번호와 비밀번호 확인을 입력해주세요.'
+        }
+    }
+
+    if (password !== confirmPassword) {
+        return {
+            error: '비밀번호가 일치하지 않습니다.'
+        }
+    }
+
+    // 비밀번호 강도 검증
+    if (password.length < 8) {
+        return {
+            error: '비밀번호는 최소 8자 이상이어야 합니다.'
+        }
+    }
+
+    if (!/(?=.*[a-z])/.test(password)) {
+        return {
+            error: '비밀번호에 소문자가 포함되어야 합니다.'
+        }
+    }
+
+    if (!/(?=.*[A-Z])/.test(password)) {
+        return {
+            error: '비밀번호에 대문자가 포함되어야 합니다.'
+        }
+    }
+
+    if (!/(?=.*\d)/.test(password)) {
+        return {
+            error: '비밀번호에 숫자가 포함되어야 합니다.'
+        }
+    }
+
+    const { error } = await supabase.auth.updateUser({
+        password: password
+    })
+
+    if (error) {
+        return {
+            error: '비밀번호 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'
+        }
+    }
+
+    redirect('/signin?message=password-updated')
+}

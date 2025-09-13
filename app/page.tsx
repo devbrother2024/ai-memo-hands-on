@@ -8,16 +8,18 @@ import {
     CardTitle
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { LogoutDialog } from '@/components/auth/logout-dialog'
 import { PenTool, Search, Tag, Download } from 'lucide-react'
 
 export default async function HomePage() {
-    // 로그인 확인
+    // 로그인 확인 - getUser()를 사용하여 서버에서 인증 확인
     const supabase = await createClient()
     const {
-        data: { user }
+        data: { user },
+        error
     } = await supabase.auth.getUser()
 
-    if (!user) {
+    if (error || !user) {
         redirect('/signin')
     }
 
@@ -35,7 +37,7 @@ export default async function HomePage() {
                                 안녕하세요, {user.email}님! 👋
                             </p>
                         </div>
-                        <Button variant="outline">로그아웃</Button>
+                        <LogoutDialog />
                     </div>
                 </div>
 
