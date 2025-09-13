@@ -24,9 +24,9 @@
 
 ## 3. 보안
 
--   **RLS 정책**
-    -   Notes/Tags: 소유자만 CRUD 가능
-    -   Summaries: 읽기만 허용, 삽입/갱신은 서버 전용
+-   **권한 스코프**
+    -   Notes/Tags: 사용자 ID 스코프로 소유자만 CRUD 가능
+    -   Summaries: 사용자 스코프 읽기, 삽입/갱신은 서버에서 처리
 -   **키 관리:** Supabase 서비스 롤 키는 서버 전용
 
 ---
