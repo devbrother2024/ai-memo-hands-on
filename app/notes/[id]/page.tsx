@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getNoteById } from '@/lib/notes/queries'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { NoteEditor } from '@/components/notes/note-editor'
 
 export default async function NoteDetailPage({
     params
@@ -24,24 +24,7 @@ export default async function NoteDetailPage({
         notFound()
     }
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-2xl font-bold">
-                            {note.title}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="prose whitespace-pre-wrap">
-                            {note.content || '내용이 없습니다.'}
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    )
+    return <NoteEditor note={note} />
 }
 
 export const metadata = {
