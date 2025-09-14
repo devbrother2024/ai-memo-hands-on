@@ -115,7 +115,7 @@ export class GeminiClient {
 
             // API 호출
             const result = await withRetry(
-                () => this.callGeminiAPI(prompt, options),
+                () => this.callGeminiAPI(prompt),
                 3,
                 1000
             )
@@ -163,8 +163,7 @@ export class GeminiClient {
      * 실제 Gemini API를 호출합니다
      */
     private async callGeminiAPI(
-        prompt: string,
-        options: Partial<GeminiGenerateRequest>
+        prompt: string
     ): Promise<{ text: string; finishReason?: string }> {
         // 타임아웃 설정
         const timeoutPromise = new Promise<never>((_, reject) => {

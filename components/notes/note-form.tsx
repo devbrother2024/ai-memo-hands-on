@@ -31,7 +31,11 @@ export function NoteForm() {
             await createNote(formData)
             // createNote에서 redirect가 처리되므로 여기서는 추가 작업 불필요
         } catch (err) {
-            setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.')
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : '알 수 없는 오류가 발생했습니다.'
+            )
             setIsSubmitting(false)
         }
     }
@@ -44,13 +48,18 @@ export function NoteForm() {
         <div className="max-w-4xl mx-auto px-4 py-8">
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold">새 노트 작성</CardTitle>
+                    <CardTitle className="text-2xl font-bold">
+                        새 노트 작성
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form action={handleSubmit} className="space-y-6">
                         {/* 제목 입력 */}
                         <div className="space-y-2">
-                            <Label htmlFor="title" className="text-sm font-medium">
+                            <Label
+                                htmlFor="title"
+                                className="text-sm font-medium"
+                            >
                                 제목
                             </Label>
                             <Input
@@ -63,13 +72,17 @@ export function NoteForm() {
                                 maxLength={200}
                             />
                             <p className="text-xs text-gray-500">
-                                제목이 비어있으면 "제목 없음"으로 저장됩니다.
+                                제목이 비어있으면 &quot;제목 없음&quot;으로
+                                저장됩니다.
                             </p>
                         </div>
 
                         {/* 본문 입력 */}
                         <div className="space-y-2">
-                            <Label htmlFor="content" className="text-sm font-medium">
+                            <Label
+                                htmlFor="content"
+                                className="text-sm font-medium"
+                            >
                                 내용
                             </Label>
                             <Textarea

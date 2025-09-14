@@ -10,7 +10,7 @@ import { SummaryGenerator } from './summary-generator'
 import { TagGenerator } from './tag-generator'
 import { useAutoSave } from '@/lib/notes/hooks'
 import { cn } from '@/lib/utils'
-import type { Note, Summary, Tag } from '@/lib/db/schema/notes'
+import type { Note } from '@/lib/db/schema/notes'
 
 interface NoteEditorProps {
     note: Note
@@ -19,10 +19,6 @@ interface NoteEditorProps {
 
 export function NoteEditor({ note, className }: NoteEditorProps) {
     const [isEditingTitle, setIsEditingTitle] = useState(false)
-    const [currentSummary, setCurrentSummary] = useState<Summary | undefined>(
-        undefined
-    )
-    const [currentTags, setCurrentTags] = useState<Tag[]>([])
     const [shortcutKey, setShortcutKey] = useState('Ctrl')
 
     const {
@@ -143,20 +139,14 @@ export function NoteEditor({ note, className }: NoteEditorProps) {
                 {/* 요약 영역 */}
                 {content && content.trim().length > 50 && (
                     <div className="mt-6">
-                        <SummaryGenerator
-                            noteId={note.id}
-                            onSummaryUpdate={setCurrentSummary}
-                        />
+                        <SummaryGenerator noteId={note.id} />
                     </div>
                 )}
 
                 {/* 태그 영역 */}
                 {content && content.trim().length > 50 && (
                     <div className="mt-6">
-                        <TagGenerator
-                            noteId={note.id}
-                            onTagUpdate={setCurrentTags}
-                        />
+                        <TagGenerator noteId={note.id} />
                     </div>
                 )}
 

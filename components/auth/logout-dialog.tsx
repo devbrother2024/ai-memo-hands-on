@@ -35,7 +35,7 @@ export function LogoutDialog({ trigger }: LogoutDialogProps) {
                 setIsLoading(false)
             }
             // 성공 시 서버 액션에서 리다이렉트가 일어남
-        } catch (err) {
+        } catch {
             setError('예상치 못한 오류가 발생했습니다. 다시 시도해주세요.')
             setIsLoading(false)
         }

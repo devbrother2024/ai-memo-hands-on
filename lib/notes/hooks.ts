@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { updateNote, type UpdateNoteInput } from './actions'
 import { debounce } from '@/lib/utils/debounce'
 
@@ -55,12 +55,17 @@ export function useAutoSave({
         [noteId]
     )
 
-    // 디바운스된 저장 함수
-    const debouncedSave = useCallback(
-        debounce((data: UpdateNoteInput) => {
+    // 디바운스된 저장 함수 생성
+    const createDebouncedSave = useCallback(() => {
+        return debounce((data: UpdateNoteInput) => {
             saveNote(data)
-        }, delay),
-        [saveNote, delay]
+        }, delay)
+    }, [saveNote, delay])
+
+    // 실제 디바운스된 저장 함수
+    const debouncedSave = useMemo(
+        () => createDebouncedSave(),
+        [createDebouncedSave]
     )
 
     // 즉시 저장 함수 (Cmd/Ctrl+S 용)

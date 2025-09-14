@@ -135,7 +135,7 @@ export function calculateTokenUsage(
  * @param model 모델명
  * @returns 예상 비용 (USD)
  */
-export function estimateCost(tokenUsage: TokenUsage, _model?: string): number {
+export function estimateCost(tokenUsage: TokenUsage): number {
     // Gemini 2.0 Flash 기준 가격 (2024년 기준)
     // Input: $0.15 per 1M tokens
     // Output: $0.60 per 1M tokens
