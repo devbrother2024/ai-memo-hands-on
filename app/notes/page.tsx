@@ -1,16 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getUserNotesPaginated, type NotesSort } from '@/lib/notes/queries'
+import {
+    getUserNotesPaginated,
+    searchUserNotes,
+    type NotesSort
+} from '@/lib/notes/queries'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { NotesSortControl } from '@/components/notes/notes-sort'
 import { NotesList } from '@/components/notes/notes-list'
+import { SearchInput } from '@/components/notes/search-input'
 
 export default async function NotesPage({
     searchParams
 }: {
-    searchParams: Promise<{ page?: string; sort?: string }>
+    searchParams: Promise<{ page?: string; sort?: string; search?: string }>
 }) {
     // 로그인 확인
     const supabase = await createClient()
@@ -28,15 +33,25 @@ export default async function NotesPage({
     const params = await searchParams
     const currentPage = Math.max(1, parseInt(params?.page || '1', 10) || 1)
     const sortParam = (params?.sort || 'newest') as NotesSort
+    const searchQuery = params?.search || ''
 
-    // 사용자 노트 페이지네이션 조회
-    const { notes, totalCount } = await getUserNotesPaginated({
-        page: currentPage,
-        limit: PAGE_SIZE,
-        sort: ['newest', 'oldest', 'title'].includes(sortParam)
-            ? sortParam
-            : 'newest'
-    })
+    // 검색 또는 일반 노트 조회
+    const { notes, totalCount } = searchQuery
+        ? await searchUserNotes({
+              query: searchQuery,
+              page: currentPage,
+              limit: PAGE_SIZE,
+              sort: ['newest', 'oldest', 'title'].includes(sortParam)
+                  ? sortParam
+                  : 'newest'
+          })
+        : await getUserNotesPaginated({
+              page: currentPage,
+              limit: PAGE_SIZE,
+              sort: ['newest', 'oldest', 'title'].includes(sortParam)
+                  ? sortParam
+                  : 'newest'
+          })
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -48,7 +63,9 @@ export default async function NotesPage({
                             내 노트
                         </h1>
                         <p className="text-gray-600 mt-1">
-                            총 {totalCount}개의 노트
+                            {searchQuery
+                                ? `'${searchQuery}' 검색 결과 ${totalCount}개`
+                                : `총 ${totalCount}개의 노트`}
                         </p>
                     </div>
                     <Link href="/notes/new">
@@ -58,13 +75,18 @@ export default async function NotesPage({
                     </Link>
                 </div>
 
-                {/* 정렬 컨트롤 */}
-                <div className="flex items-center justify-end mb-4">
-                    <NotesSortControl currentSort={sortParam} />
+                {/* 검색 및 정렬 */}
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div className="flex-1">
+                        <SearchInput className="max-w-md" />
+                    </div>
+                    <div className="flex items-center">
+                        <NotesSortControl currentSort={sortParam} />
+                    </div>
                 </div>
 
                 {/* 노트 목록 */}
-                <NotesList initialNotes={notes} />
+                <NotesList initialNotes={notes} searchQuery={searchQuery} />
 
                 {/* 페이지네이션 */}
                 {totalCount > PAGE_SIZE && (
@@ -73,7 +95,13 @@ export default async function NotesPage({
                             href={`/notes?page=${Math.max(
                                 1,
                                 currentPage - 1
-                            )}&sort=${sortParam}`}
+                            )}&sort=${sortParam}${
+                                searchQuery
+                                    ? `&search=${encodeURIComponent(
+                                          searchQuery
+                                      )}`
+                                    : ''
+                            }`}
                         >
                             <Button
                                 variant="outline"
@@ -91,7 +119,13 @@ export default async function NotesPage({
                             },
                             (_, idx) => idx + 1
                         ).map(pageNum => {
-                            const href = `/notes?page=${pageNum}&sort=${sortParam}`
+                            const href = `/notes?page=${pageNum}&sort=${sortParam}${
+                                searchQuery
+                                    ? `&search=${encodeURIComponent(
+                                          searchQuery
+                                      )}`
+                                    : ''
+                            }`
                             const isActive = pageNum === currentPage
                             return (
                                 <Link key={pageNum} href={href}>
@@ -109,7 +143,13 @@ export default async function NotesPage({
                         <Link
                             href={`/notes?page=${
                                 currentPage + 1
-                            }&sort=${sortParam}`}
+                            }&sort=${sortParam}${
+                                searchQuery
+                                    ? `&search=${encodeURIComponent(
+                                          searchQuery
+                                      )}`
+                                    : ''
+                            }`}
                         >
                             <Button
                                 variant="outline"

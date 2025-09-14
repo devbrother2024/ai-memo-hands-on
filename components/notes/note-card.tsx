@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DeleteNoteButton } from './delete-note-button'
+import { HighlightText } from './highlight-text'
 import { formatRelativeDate, getContentPreview } from '@/lib/notes/utils'
 import { cn } from '@/lib/utils'
 import type { Note } from '@/lib/db/schema/notes'
@@ -11,10 +12,16 @@ import type { Note } from '@/lib/db/schema/notes'
 interface NoteCardProps {
     note: Note
     onDelete?: (noteId: string) => void
+    searchQuery?: string
     className?: string
 }
 
-export function NoteCard({ note, onDelete, className }: NoteCardProps) {
+export function NoteCard({
+    note,
+    onDelete,
+    searchQuery = '',
+    className
+}: NoteCardProps) {
     const [isDeleted, setIsDeleted] = useState(false)
 
     const handleDelete = () => {
@@ -39,7 +46,10 @@ export function NoteCard({ note, onDelete, className }: NoteCardProps) {
                 <CardHeader className="pb-3">
                     <div className="flex items-start justify-between gap-2">
                         <CardTitle className="text-lg line-clamp-2 flex-1">
-                            {note.title}
+                            <HighlightText
+                                text={note.title}
+                                highlight={searchQuery}
+                            />
                         </CardTitle>
                         <div
                             className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -60,9 +70,11 @@ export function NoteCard({ note, onDelete, className }: NoteCardProps) {
                     </p>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-gray-700 text-sm line-clamp-3">
-                        {getContentPreview(note.content)}
-                    </p>
+                    <HighlightText
+                        text={getContentPreview(note.content)}
+                        highlight={searchQuery}
+                        className="text-gray-700 text-sm line-clamp-3"
+                    />
                 </CardContent>
             </Link>
         </Card>
