@@ -66,6 +66,10 @@ export class SummaryGenerator {
                     `AI 요약 생성 중 오류가 발생했습니다: ${error.message}`
                 )
             }
+            if (error instanceof Error) {
+                // validateSummaryQuality에서 발생한 에러는 그대로 전파
+                throw error
+            }
             throw new Error('요약 생성 중 예상치 못한 오류가 발생했습니다.')
         }
     }

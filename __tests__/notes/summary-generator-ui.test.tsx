@@ -5,7 +5,8 @@ import { SummaryGenerator } from '@/components/notes/summary-generator'
 import {
     generateNoteSummary,
     updateNoteSummary,
-    deleteNoteSummary
+    deleteNoteSummary,
+    getNoteSummary
 } from '@/lib/notes/summary-actions'
 import type { Summary } from '@/lib/db/schema/notes'
 
@@ -21,6 +22,9 @@ const mockUpdateNoteSummary = updateNoteSummary as jest.MockedFunction<
 >
 const mockDeleteNoteSummary = deleteNoteSummary as jest.MockedFunction<
     typeof deleteNoteSummary
+>
+const mockGetNoteSummary = getNoteSummary as jest.MockedFunction<
+    typeof getNoteSummary
 >
 const mockToast = toast as jest.MockedFunction<typeof toast>
 
@@ -39,6 +43,12 @@ describe('SummaryGenerator Component', () => {
         // Toast 모킹
         mockToast.success = jest.fn()
         mockToast.error = jest.fn()
+
+        // getNoteSummary 기본 모킹 (요약 없음)
+        mockGetNoteSummary.mockResolvedValue({
+            success: false,
+            error: '요약을 찾을 수 없습니다.'
+        })
     })
 
     describe('초기 렌더링', () => {
@@ -61,7 +71,9 @@ describe('SummaryGenerator Component', () => {
             )
 
             // 멀티라인 텍스트는 부분 매칭으로 확인
-            expect(screen.getByText('• 첫 번째 요점')).toBeInTheDocument()
+            expect(
+                screen.getByText('첫 번째 요점', { exact: false })
+            ).toBeInTheDocument()
             expect(screen.getByText('재생성')).toBeInTheDocument()
 
             // SVG 아이콘이 있는 버튼들은 클래스로 확인
@@ -170,9 +182,9 @@ describe('SummaryGenerator Component', () => {
             fireEvent.click(editButton!)
 
             // Then
-            expect(
-                screen.getByDisplayValue(mockSummary.content)
-            ).toBeInTheDocument()
+            const textarea = screen.getByRole('textbox')
+            expect(textarea).toBeInTheDocument()
+            expect(textarea).toHaveValue(mockSummary.content)
             expect(screen.getByText('저장')).toBeInTheDocument()
             expect(screen.getByText('취소')).toBeInTheDocument()
         })
@@ -197,9 +209,12 @@ describe('SummaryGenerator Component', () => {
             )
 
             // When
-            fireEvent.click(screen.getByRole('button', { name: /edit/i }))
+            const editButton = document
+                .querySelector('.lucide-pen-line')
+                ?.closest('button')
+            fireEvent.click(editButton!)
 
-            const textarea = screen.getByDisplayValue(mockSummary.content)
+            const textarea = screen.getByRole('textbox')
             fireEvent.change(textarea, { target: { value: updatedContent } })
             fireEvent.click(screen.getByText('저장'))
 
@@ -225,14 +240,17 @@ describe('SummaryGenerator Component', () => {
             )
 
             // When
-            fireEvent.click(screen.getByRole('button', { name: /edit/i }))
+            const editButton = document
+                .querySelector('.lucide-pen-line')
+                ?.closest('button')
+            fireEvent.click(editButton!)
             fireEvent.click(screen.getByText('취소'))
 
             // Then
+            expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
             expect(
-                screen.queryByDisplayValue(mockSummary.content)
-            ).not.toBeInTheDocument()
-            expect(screen.getByText(mockSummary.content)).toBeInTheDocument()
+                screen.getByText('첫 번째 요점', { exact: false })
+            ).toBeInTheDocument()
         })
     })
 
@@ -252,7 +270,10 @@ describe('SummaryGenerator Component', () => {
             )
 
             // When
-            fireEvent.click(screen.getByRole('button', { name: /trash/i }))
+            const deleteButton = document
+                .querySelector('.lucide-trash2')
+                ?.closest('button')
+            fireEvent.click(deleteButton!)
 
             // Then
             expect(window.confirm).toHaveBeenCalledWith(
@@ -282,7 +303,10 @@ describe('SummaryGenerator Component', () => {
             )
 
             // When
-            fireEvent.click(screen.getByRole('button', { name: /trash/i }))
+            const deleteButton = document
+                .querySelector('.lucide-trash2')
+                ?.closest('button')
+            fireEvent.click(deleteButton!)
 
             // Then
             expect(window.confirm).toHaveBeenCalled()

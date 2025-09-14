@@ -59,7 +59,7 @@ describe('SummaryGenerator', () => {
             expect(result).toEqual({
                 content: mockApiResponse.text,
                 tokensUsed: mockApiResponse.totalTokens,
-                model: 'gemini-1.5-flash'
+                model: 'gemini-2.0-flash-001'
             })
             expect(mockGeminiClient.generateText).toHaveBeenCalledWith(
                 expect.stringContaining(
@@ -102,7 +102,9 @@ describe('SummaryGenerator', () => {
             // When & Then
             await expect(
                 summaryGenerator.generateSummary(sampleContent)
-            ).rejects.toThrow('요약이 너무 짧습니다')
+            ).rejects.toThrow(
+                '요약이 너무 짧습니다. 최소 3개의 요점이 필요합니다.'
+            )
         })
 
         it('불릿 포인트가 최대 개수를 초과하면 자동으로 잘라야 한다', async () => {
@@ -155,7 +157,7 @@ describe('SummaryGenerator', () => {
             // When & Then
             await expect(
                 summaryGenerator.generateSummary(sampleContent)
-            ).rejects.toThrow('요약 생성 중 예상치 못한 오류가 발생했습니다.')
+            ).rejects.toThrow('네트워크 오류')
         })
 
         it('커스텀 옵션으로 요약을 생성할 수 있어야 한다', async () => {
