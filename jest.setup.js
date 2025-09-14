@@ -28,3 +28,25 @@ Object.defineProperty(navigator, 'platform', {
     writable: true,
     value: 'MacIntel'
 })
+
+// Mock TextEncoder/TextDecoder for Node.js compatibility
+import { TextEncoder, TextDecoder } from 'util'
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
+
+// Mock Request/Response for Next.js server actions
+global.Request = class MockRequest {
+    constructor(url, options = {}) {
+        this.url = url
+        this.method = options.method || 'GET'
+        this.headers = new Map(Object.entries(options.headers || {}))
+    }
+}
+
+global.Response = class MockResponse {
+    constructor(body, options = {}) {
+        this.body = body
+        this.status = options.status || 200
+        this.headers = new Map(Object.entries(options.headers || {}))
+    }
+}

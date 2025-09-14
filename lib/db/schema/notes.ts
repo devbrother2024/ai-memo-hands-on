@@ -26,6 +26,28 @@ export const summaries = pgTable('summaries', {
         .notNull()
 })
 
+export const tags = pgTable('tags', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    name: text('name').notNull().unique(),
+    color: text('color'), // 태그 색상 (선택적)
+    createdAt: timestamp('created_at', { withTimezone: true })
+        .defaultNow()
+        .notNull()
+})
+
+export const noteTags = pgTable('note_tags', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    noteId: uuid('note_id')
+        .notNull()
+        .references(() => notes.id, { onDelete: 'cascade' }),
+    tagId: uuid('tag_id')
+        .notNull()
+        .references(() => tags.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+        .defaultNow()
+        .notNull()
+})
+
 // Zod 스키마 자동 생성
 export const insertNoteSchema = createInsertSchema(notes, {
     title: z =>
@@ -44,7 +66,25 @@ export const insertSummarySchema = createInsertSchema(summaries, {
 
 export const selectSummarySchema = createSelectSchema(summaries)
 
+// Tag 스키마
+export const insertTagSchema = createInsertSchema(tags, {
+    name: z =>
+        z
+            .min(1, '태그명을 입력해주세요')
+            .max(50, '태그명은 50자 이내로 입력해주세요')
+})
+
+export const selectTagSchema = createSelectSchema(tags)
+
+// NoteTag 스키마
+export const insertNoteTagSchema = createInsertSchema(noteTags)
+export const selectNoteTagSchema = createSelectSchema(noteTags)
+
 export type Note = typeof notes.$inferSelect
 export type NewNote = typeof notes.$inferInsert
 export type Summary = typeof summaries.$inferSelect
 export type NewSummary = typeof summaries.$inferInsert
+export type Tag = typeof tags.$inferSelect
+export type NewTag = typeof tags.$inferInsert
+export type NoteTag = typeof noteTags.$inferSelect
+export type NewNoteTag = typeof noteTags.$inferInsert

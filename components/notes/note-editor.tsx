@@ -7,9 +7,10 @@ import { SaveStatus } from './save-status'
 import { BackButton } from '@/components/ui/back-button'
 import { DeleteNoteButton } from './delete-note-button'
 import { SummaryGenerator } from './summary-generator'
+import { TagGenerator } from './tag-generator'
 import { useAutoSave } from '@/lib/notes/hooks'
 import { cn } from '@/lib/utils'
-import type { Note, Summary } from '@/lib/db/schema/notes'
+import type { Note, Summary, Tag } from '@/lib/db/schema/notes'
 
 interface NoteEditorProps {
     note: Note
@@ -21,6 +22,7 @@ export function NoteEditor({ note, className }: NoteEditorProps) {
     const [currentSummary, setCurrentSummary] = useState<Summary | undefined>(
         undefined
     )
+    const [currentTags, setCurrentTags] = useState<Tag[]>([])
     const [shortcutKey, setShortcutKey] = useState('Ctrl')
 
     const {
@@ -144,6 +146,16 @@ export function NoteEditor({ note, className }: NoteEditorProps) {
                         <SummaryGenerator
                             noteId={note.id}
                             onSummaryUpdate={setCurrentSummary}
+                        />
+                    </div>
+                )}
+
+                {/* 태그 영역 */}
+                {content && content.trim().length > 50 && (
+                    <div className="mt-6">
+                        <TagGenerator
+                            noteId={note.id}
+                            onTagUpdate={setCurrentTags}
                         />
                     </div>
                 )}
