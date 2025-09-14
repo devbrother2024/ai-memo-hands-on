@@ -8,15 +8,15 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 const customJestConfig = {
     setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-    testEnvironment: 'jest-environment-node',
-    preset: 'ts-jest',
+    testEnvironment: 'jest-environment-jsdom',
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-    transform: {
-        '^.+\\.(ts|tsx)$': 'ts-jest'
-    },
-    testMatch: ['**/__tests__/**/*.(ts|js)', '**/*.(test|spec).(ts|js)'],
+    testMatch: [
+        '**/__tests__/**/*.(ts|tsx|js)',
+        '**/*.(test|spec).(ts|tsx|js)'
+    ],
     moduleNameMapper: {
-        '^@/(.*)$': '<rootDir>/$1'
+        '^@/(.*)$': '<rootDir>/$1',
+        '^@google/genai$': '<rootDir>/__mocks__/@google/genai.js'
     },
     collectCoverageFrom: [
         'lib/**/*.{ts,tsx}',
@@ -25,7 +25,8 @@ const customJestConfig = {
         '!**/*.stories.{ts,tsx}'
     ],
     coverageReporters: ['text', 'lcov', 'html'],
-    testTimeout: 10000
+    testTimeout: 10000,
+    transformIgnorePatterns: ['node_modules/(?!(sonner|lucide-react)/)']
 }
 
 export default createJestConfig(customJestConfig)

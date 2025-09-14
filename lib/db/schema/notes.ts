@@ -14,6 +14,18 @@ export const notes = pgTable('notes', {
         .notNull()
 })
 
+export const summaries = pgTable('summaries', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    noteId: uuid('note_id')
+        .notNull()
+        .references(() => notes.id, { onDelete: 'cascade' }),
+    model: text('model').notNull(),
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+        .defaultNow()
+        .notNull()
+})
+
 // Zod 스키마 자동 생성
 export const insertNoteSchema = createInsertSchema(notes, {
     title: z =>
@@ -25,5 +37,14 @@ export const insertNoteSchema = createInsertSchema(notes, {
 
 export const selectNoteSchema = createSelectSchema(notes)
 
+// Summary 스키마
+export const insertSummarySchema = createInsertSchema(summaries, {
+    content: z => z.min(1, '요약 내용을 입력해주세요')
+})
+
+export const selectSummarySchema = createSelectSchema(summaries)
+
 export type Note = typeof notes.$inferSelect
 export type NewNote = typeof notes.$inferInsert
+export type Summary = typeof summaries.$inferSelect
+export type NewSummary = typeof summaries.$inferInsert

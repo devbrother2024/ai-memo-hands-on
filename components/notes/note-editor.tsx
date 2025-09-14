@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { AutoResizeTextarea } from './auto-resize-textarea'
 import { SaveStatus } from './save-status'
 import { BackButton } from '@/components/ui/back-button'
 import { DeleteNoteButton } from './delete-note-button'
+import { SummaryGenerator } from './summary-generator'
 import { useAutoSave } from '@/lib/notes/hooks'
 import { cn } from '@/lib/utils'
-import type { Note } from '@/lib/db/schema/notes'
+import type { Note, Summary } from '@/lib/db/schema/notes'
 
 interface NoteEditorProps {
     note: Note
@@ -17,6 +18,10 @@ interface NoteEditorProps {
 
 export function NoteEditor({ note, className }: NoteEditorProps) {
     const [isEditingTitle, setIsEditingTitle] = useState(false)
+    const [currentSummary, setCurrentSummary] = useState<Summary | undefined>(
+        undefined
+    )
+    const [shortcutKey, setShortcutKey] = useState('Ctrl')
 
     const {
         title,
@@ -32,6 +37,17 @@ export function NoteEditor({ note, className }: NoteEditorProps) {
         initialTitle: note.title,
         initialContent: note.content || ''
     })
+
+    // SummaryGenerator에서 직접 로딩하므로 여기서는 단순히 상태만 관리
+    // useEffect는 제거하고 onSummaryUpdate 콜백으로만 동기화
+
+    // 클라이언트에서 플랫폼 감지
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const isMac = navigator.platform.toLowerCase().includes('mac')
+            setShortcutKey(isMac ? 'Cmd' : 'Ctrl')
+        }
+    }, [])
 
     const handleTitleClick = () => {
         setIsEditingTitle(true)
@@ -122,12 +138,20 @@ export function NoteEditor({ note, className }: NoteEditorProps) {
                     </div>
                 </div>
 
+                {/* 요약 영역 */}
+                {content && content.trim().length > 50 && (
+                    <div className="mt-6">
+                        <SummaryGenerator
+                            noteId={note.id}
+                            onSummaryUpdate={setCurrentSummary}
+                        />
+                    </div>
+                )}
+
                 {/* 키보드 단축키 안내 */}
                 <div className="mt-6 text-sm text-muted-foreground text-center">
                     <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">
-                        {navigator.platform.toLowerCase().includes('mac')
-                            ? 'Cmd'
-                            : 'Ctrl'}
+                        {shortcutKey}
                     </kbd>
                     {' + '}
                     <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">
