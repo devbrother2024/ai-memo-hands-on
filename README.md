@@ -61,8 +61,23 @@ DROP TABLE IF EXISTS public.notes CASCADE;
 #### 스키마 적용
 
 ```bash
-# Drizzle을 사용하여 데이터베이스 스키마 적용
-pnpm run db:push
+# 1. 스키마에서 마이그레이션 파일 생성
+pnpm run db:generate
+
+# 2. 마이그레이션을 데이터베이스에 적용
+pnpm run db:migrate
+```
+
+성공하면 다음과 같은 메시지가 출력됩니다:
+
+```bash
+# db:generate 후
+✓ Generated 1 migration
+
+# db:migrate 후
+✓ No schema changes, nothing to migrate
+# 또는
+✓ Applied 1 migration
 ```
 
 ### 5. RLS 정책 적용
