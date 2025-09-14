@@ -2,11 +2,10 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getUserNotesPaginated, type NotesSort } from '@/lib/notes/queries'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PenTool, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
-import { formatRelativeDate, getContentPreview } from '@/lib/notes/utils'
 import { NotesSortControl } from '@/components/notes/notes-sort'
+import { NotesList } from '@/components/notes/notes-list'
 
 export default async function NotesPage({
     searchParams
@@ -65,51 +64,7 @@ export default async function NotesPage({
                 </div>
 
                 {/* 노트 목록 */}
-                {notes.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {notes.map(note => (
-                            <Link href={`/notes/${note.id}`} key={note.id}>
-                                <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                                    <CardHeader className="pb-3">
-                                        <CardTitle className="text-lg line-clamp-2">
-                                            {note.title}
-                                        </CardTitle>
-                                        <p className="text-sm text-gray-500">
-                                            {formatRelativeDate(note.updatedAt)}
-                                        </p>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-gray-700 text-sm line-clamp-3">
-                                            {getContentPreview(note.content)}
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        ))}
-                    </div>
-                ) : (
-                    /* 빈 상태 */
-                    <Card>
-                        <CardContent className="py-16">
-                            <div className="text-center">
-                                <PenTool className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                    아직 작성된 노트가 없습니다
-                                </h3>
-                                <p className="text-gray-500 mb-6 max-w-md mx-auto">
-                                    첫 번째 노트를 작성해보세요. AI가 자동으로
-                                    요약하고 태그를 생성해드립니다.
-                                </p>
-                                <Link href="/notes/new">
-                                    <Button>
-                                        <Plus className="w-4 h-4 mr-2" />첫 번째
-                                        노트 작성하기
-                                    </Button>
-                                </Link>
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
+                <NotesList initialNotes={notes} totalCount={totalCount} />
 
                 {/* 페이지네이션 */}
                 {totalCount > PAGE_SIZE && (

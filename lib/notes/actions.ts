@@ -124,3 +124,49 @@ export async function updateNote(
         return { success: false, error: '노트 저장에 실패했습니다' }
     }
 }
+
+export async function deleteNote(noteId: string): Promise<{
+    success: boolean
+    error?: string
+}> {
+    const supabase = await createClient()
+
+    // 사용자 인증 확인
+    const {
+        data: { user },
+        error: authError
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+        return { success: false, error: '인증이 필요합니다' }
+    }
+
+    try {
+        // 노트 소유자 확인
+        const [existingNote] = await db
+            .select()
+            .from(notes)
+            .where(eq(notes.id, noteId))
+            .limit(1)
+
+        if (!existingNote) {
+            return { success: false, error: '노트를 찾을 수 없습니다' }
+        }
+
+        if (existingNote.userId !== user.id) {
+            return { success: false, error: '이 노트를 삭제할 권한이 없습니다' }
+        }
+
+        // 노트 삭제
+        await db.delete(notes).where(eq(notes.id, noteId))
+
+        // 캐시 무효화
+        revalidatePath('/notes')
+        revalidatePath(`/notes/${noteId}`)
+
+        return { success: true }
+    } catch (error) {
+        console.error('노트 삭제 실패:', error)
+        return { success: false, error: '노트 삭제에 실패했습니다' }
+    }
+}

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { AutoResizeTextarea } from './auto-resize-textarea'
 import { SaveStatus } from './save-status'
 import { BackButton } from '@/components/ui/back-button'
+import { DeleteNoteButton } from './delete-note-button'
 import { useAutoSave } from '@/lib/notes/hooks'
 import { cn } from '@/lib/utils'
 import type { Note } from '@/lib/db/schema/notes'
@@ -59,11 +60,20 @@ export function NoteEditor({ note, className }: NoteEditorProps) {
                 {/* 헤더 영역 */}
                 <div className="flex items-center justify-between mb-6">
                     <BackButton />
-                    <SaveStatus
-                        status={saveStatus}
-                        lastSavedAt={lastSavedAt}
-                        onRetry={saveImmediately}
-                    />
+                    <div className="flex items-center gap-3">
+                        <DeleteNoteButton
+                            noteId={note.id}
+                            noteTitle={note.title}
+                            variant="outline"
+                            size="sm"
+                            redirectAfterDelete={true}
+                        />
+                        <SaveStatus
+                            status={saveStatus}
+                            lastSavedAt={lastSavedAt}
+                            onRetry={saveImmediately}
+                        />
+                    </div>
                 </div>
 
                 {/* 편집 영역 */}

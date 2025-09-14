@@ -1,0 +1,62 @@
+'use client'
+
+import { useState } from 'react'
+import { NoteCard } from './note-card'
+import { PenTool, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import Link from 'next/link'
+import type { Note } from '@/lib/db/schema/notes'
+
+interface NotesListProps {
+    initialNotes: Note[]
+    totalCount: number
+}
+
+export function NotesList({ initialNotes, totalCount }: NotesListProps) {
+    const [notes, setNotes] = useState(initialNotes)
+
+    const handleNoteDelete = (noteId: string) => {
+        // 낙관적 업데이트: 즉시 UI에서 노트 제거
+        setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId))
+    }
+
+    return (
+        <>
+            {/* 노트 목록 */}
+            {notes.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {notes.map(note => (
+                        <NoteCard
+                            key={note.id}
+                            note={note}
+                            onDelete={handleNoteDelete}
+                        />
+                    ))}
+                </div>
+            ) : (
+                /* 빈 상태 */
+                <Card>
+                    <CardContent className="py-16">
+                        <div className="text-center">
+                            <PenTool className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                아직 작성된 노트가 없습니다
+                            </h3>
+                            <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                                첫 번째 노트를 작성해보세요. AI가 자동으로
+                                요약하고 태그를 생성해드립니다.
+                            </p>
+                            <Link href="/notes/new">
+                                <Button>
+                                    <Plus className="w-4 h-4 mr-2" />첫 번째
+                                    노트 작성하기
+                                </Button>
+                            </Link>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+        </>
+    )
+}
