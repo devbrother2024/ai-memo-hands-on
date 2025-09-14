@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NoteCard } from './note-card'
 import { PenTool, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -10,11 +10,15 @@ import type { Note } from '@/lib/db/schema/notes'
 
 interface NotesListProps {
     initialNotes: Note[]
-    totalCount: number
 }
 
-export function NotesList({ initialNotes, totalCount }: NotesListProps) {
+export function NotesList({ initialNotes }: NotesListProps) {
     const [notes, setNotes] = useState(initialNotes)
+
+    // initialNotes가 변경될 때마다 notes 상태 업데이트
+    useEffect(() => {
+        setNotes(initialNotes)
+    }, [initialNotes])
 
     const handleNoteDelete = (noteId: string) => {
         // 낙관적 업데이트: 즉시 UI에서 노트 제거

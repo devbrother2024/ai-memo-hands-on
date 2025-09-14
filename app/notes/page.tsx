@@ -64,7 +64,7 @@ export default async function NotesPage({
                 </div>
 
                 {/* 노트 목록 */}
-                <NotesList initialNotes={notes} totalCount={totalCount} />
+                <NotesList initialNotes={notes} />
 
                 {/* 페이지네이션 */}
                 {totalCount > PAGE_SIZE && (
