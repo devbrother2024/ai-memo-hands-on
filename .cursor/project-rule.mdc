@@ -42,6 +42,13 @@ alwaysApply: true
 -   라우팅은 반드시 **Next.js App Router**(`/app` 디렉토리) 사용
 -   서버 로직은 **Server Actions**으로 구현
 
+### Next.js 비동기 규칙 (ASYNC)
+
+-   **Server Components(Page/Layout)**: `params`, `searchParams`는 Promise다. 시그니처를 Promise로 선언하고 사용 전 `await`하라.
+-   **Client Components**: `useSearchParams()`, `useParams()` 사용. 이 훅들은 동기이므로 `await`하지 말라.
+-   **금지**: `searchParams?.page`, `searchParams.sort`, `params.id` 등 비동기 프로퍼티의 즉시 접근.
+-   **파싱 규칙**: 페이지는 최소 1로 정규화, 정렬은 화이트리스트(`newest|oldest|title`) 검증.
+
 ---
 
 ## 데이터베이스 & ORM (DATABASE & ORM)
