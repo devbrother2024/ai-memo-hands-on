@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { LogoutDialog } from '@/components/auth/logout-dialog'
 import { PenTool, Search, Tag, Download } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function HomePage() {
     // 로그인 확인 - getUser()를 사용하여 서버에서 인증 확인
@@ -52,9 +53,11 @@ export default async function HomePage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Button className="bg-blue-600 hover:bg-blue-700">
-                            첫 번째 메모 작성하기
-                        </Button>
+                        <Link href="/notes/new">
+                            <Button className="bg-blue-600 hover:bg-blue-700">
+                                첫 번째 메모 작성하기
+                            </Button>
+                        </Link>
                     </CardContent>
                 </Card>
 
@@ -130,7 +133,9 @@ export default async function HomePage() {
                             <p className="text-gray-500 mb-6">
                                 AI가 자동으로 요약하고 태그를 생성해드립니다
                             </p>
-                            <Button>메모 작성하기</Button>
+                            <Link href="/notes/new">
+                                <Button>메모 작성하기</Button>
+                            </Link>
                         </div>
                     </CardContent>
                 </Card>
